@@ -1,10 +1,13 @@
-from libLLE57 import LLE57
 import time
+import sys
+sys.path.append('../')
+from libLLE57 import LLE57
 
 treppen = []
 for i in range(0, 3):
-	treppen.append(LLE57(serialport = '/dev/ttyUSB3', slave = i + 1))
-	treppen[i].cmd_set_conserve_font()
+	treppen.append(LLE57(serialport = '/dev/ttyUSB3', slave = i + 1, lineheight = 63))
+	#treppen[i].cmd_set_conserve_font()
+	treppen[i].cmd_set_charset()
 	treppen[i].cmd_set_text(text = "", output = '0x04')
 	treppen[i].cmd_set_text(text = "", output = '0x01')
 	treppen[i].send(True)
