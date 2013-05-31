@@ -153,11 +153,16 @@ class LLE57(object):
 		preped = ""
 		for byte in payload:
 			byte = int(byte, 16)
+
+			# 0x00 is ignored by the function below, therefore this hack
+			if byte == 0:
+				preped += chr(0)
 			while byte:
 				preped += chr(byte & 0xFF)
 				byte >>= 8
 
 		if showpayload:
 			print payload
+			#print preped
 
 		return self.__ser.write(preped)
