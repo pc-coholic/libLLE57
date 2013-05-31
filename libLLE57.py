@@ -19,7 +19,6 @@ class LLE57(object):
 		# Add two hexadeimal numbers and return the result in hex
 		return hex(int(hex1, 16) + int(hex2, 16))
 
-
 	def make_checksum(self, command):
 		# Calculate the checksum and return it
 		# The checksum is the sum of all bytes starting from and including
@@ -51,7 +50,6 @@ class LLE57(object):
 		# Set a conserved font-dump
 		self.__datasets.append(['0x03', '0x01', '0x32', '0x87'])
 		
-
 	def cmd_set_conserve_text(self):
 		# Set a conserved text-dump
 		self.__datasets.append(['0x11', '0x01', '0x30', '0x13', '0x00', '0x00','0x00', '0x00',
@@ -106,6 +104,37 @@ class LLE57(object):
 					"%02d" % int(bin(int(spacing, 16))[2:]) + 
 					"%05d" % int(bin(int(font, 16))[2:]), 2)))
 
+		self.__datasets.append(command)
+
+	def cmd_set_graphics(self, pixels, height, width, startx = 0, starty = 0, memory = '0x01', output = '0x00'):
+		command = []
+		command.append(self.__internaladdress) # internal address
+		command.append('0x31') # Dataset-identifier (Graphics)
+		command.append(hex(int( "%04d" % int(bin(int(memory, 16))[2:]) + 
+					"%04d" % int(bin(int(output, 16))[2:]), 2))) # Textcontrol-byte
+		command.append(hex(startx)) # Horizontal position
+		command.append('0x00') # Horizontal position 2 TODO
+		command.append(hex(starty)) # Vertical position
+		command.append('0x00') # Vertical position 2 TODO
+		command.append(hex(height)) # Height of the graphic
+		command.append('0x00') # Height of the graphic 2 TODO
+		command.append(hex(width)) # Weight of the graphic
+		command.append('0x00') # Weight of the graphic 2 TODO
+
+		for line in pixels:
+			# Extend to be a multiple of 8 Bits
+			for i in range(0, 8 - (len(line) % 8)):
+				line.append(0)
+			
+			for i in range (1, (len(line) / 8)):
+				bits = ""
+				for j in range(0, 8):
+					bits += str(line[j])
+				
+				command.append(hex(int(bits, 2)))
+				
+
+		command.insert(0, hex(len(command))) # insert length of dataset at the beginning
 		self.__datasets.append(command)
 
 	def flush(self):
