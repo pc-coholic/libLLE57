@@ -76,7 +76,6 @@ class LLE57(object):
 	def cmd_set_text(self, text, memory = '0x01', output = '0x00', attrib = '0x00', startx = 0, starty = 0):
 		# Write the desired text
 		command = []
-		# length
 		command.append(self.__internaladdress) # internal address
 		command.append('0x30') # Dataset-identifier (Text)
 		command.append(hex(int( "%04d" % int(bin(int(memory, 16))[2:]) + 
@@ -97,6 +96,18 @@ class LLE57(object):
 
 		self.__datasets.append(command)
 	
+	def cmd_set_charset(self, font = '0x07', transparency = '1', spacing = '0x00'):
+		#Set the desired font, transparency and spacing
+		command = []
+		command.append('0x03') # length
+		command.append(self.__internaladdress) # internal address
+		command.append('0x32') # Dataset-identifier (set charset)
+		command.append(hex(int( str(transparency) +
+					"%02d" % int(bin(int(spacing, 16))[2:]) + 
+					"%05d" % int(bin(int(font, 16))[2:]), 2)))
+
+		self.__datasets.append(command)
+
 	def flush(self):
 		# Remove all datasets
 		self.__datasets = []
