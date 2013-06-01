@@ -163,7 +163,7 @@ class LLE57(object):
 			if (byte == '0x7E'):
 				escaped.append('0x5E')
 				
-		return payload
+		return escaped
 
 	def send(self, showpayload = False):
 		# Construct the telegram and send it
