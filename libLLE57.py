@@ -106,7 +106,7 @@ class LLE57(object):
 
 		self.__datasets.append(command)
 
-	def cmd_set_graphics(self, pixels, height, width, startx = 0, starty = 0, memory = '0x01', output = '0x00'):
+	def cmd_set_graphics(self, pixels, startx = 0, starty = 0, memory = '0x01', output = '0x00'):
 		command = []
 		command.append(self.__internaladdress) # internal address
 		command.append('0x31') # Dataset-identifier (Graphics)
@@ -116,22 +116,39 @@ class LLE57(object):
 		command.append('0x00') # Horizontal position 2 TODO
 		command.append(hex(starty)) # Vertical position
 		command.append('0x00') # Vertical position 2 TODO
-		command.append(hex(height)) # Height of the graphic
+		command.append(hex(len(pixels[0]))) # Width of the graphic	
+		command.append('0x00') # Width of the graphic 2 TODO
+		command.append(hex(len(pixels))) # Height of the graphic
 		command.append('0x00') # Height of the graphic 2 TODO
-		command.append(hex(width)) # Weight of the graphic
-		command.append('0x00') # Weight of the graphic 2 TODO
+		command.append('0xFF') # Append empty frame for whatever reason
+
+		# calculate padding
+		padding = 8 - len(pixels[0]) % 8
+		width = len(pixels[0])
+		if (padding == 8):
+			padding = 0
+
+		# add padding
+		for line in pixels:
+			#line.reverse()
+			for i in range(0, padding):
+				line.append(0)
+				#line.insert(width - 8, 0)
+
+		# process padded image
+		for line in pixels:
+			bytesperline = len(line) / 8
+
+			x = 0
+			for i in range(0, bytesperline):
+				bits = ""
+				for j in range(x, x+8):
+					bits += str(line[j])
+				command.append(hex(int(bits[::-1], 2)))
+				x += 8
 
 		for line in pixels:
-			# Extend to be a multiple of 8 Bits
-			for i in range(0, 8 - (len(line) % 8)):
-				line.append(0)
-			
-			for i in range (1, (len(line) / 8)):
-				bits = ""
-				for j in range(0, 8):
-					bits += str(line[j])
-				
-				command.append(hex(int(bits, 2)))
+			print line
 				
 
 		command.insert(0, hex(len(command))) # insert length of dataset at the beginning
